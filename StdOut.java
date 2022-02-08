@@ -1,5 +1,4 @@
 /******************************************************************************
-
  *  Compilation:  javac StdOut.java
  *  Execution:    java StdOut
  *  Dependencies: none
@@ -8,9 +7,7 @@
  *
  ******************************************************************************/
 
-import java.lang.System;
 import java.io.OutputStreamWriter;
-
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
@@ -272,7 +269,6 @@ public final class StdOut {
         out.print(x);
         out.flush();
     }
-    
 
    /**
      * Prints a formatted string to standard output, using the specified format
@@ -300,8 +296,7 @@ public final class StdOut {
         out.flush();
     }
 
-    
-    /**
+   /**
      * Unit tests some of the methods in {@code StdOut}.
      *
      * @param args the command-line arguments
