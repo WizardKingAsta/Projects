@@ -1,4 +1,6 @@
+package searchengine;
 /******************************************************************************
+ * 
  *  Compilation:  javac StdIn.java
  *  Execution:    java StdIn   (interactive test of basic functionality)
  *  Dependencies: none
@@ -640,6 +642,7 @@ public final class StdIn {
 
     public static void setFile(String filename) {
         try {
+            scanner.close(); // warning, this may close StdIn the first time!
             setScanner(new Scanner(new java.io.File(filename), CHARSET_NAME));
         }
         catch (java.io.IOException ioe) {
@@ -676,4 +679,3 @@ public final class StdIn {
     }
 
 }
-
