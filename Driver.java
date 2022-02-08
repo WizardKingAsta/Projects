@@ -1,250 +1,199 @@
+
+package huffman;
+
 import java.util.ArrayList;
 
 /**
- * This class is designed to test each method in the Transit file interactively
+ * This class is designed to test each step of the huffman coding process when run
  * 
  * @author Ishaan Ivaturi
  */
 public class Driver {
     public static void main(String[] args) {
-		String[] methods = {"makeList", "removeStation", "addStop", "bestPath", "duplicate", "addScooter"};
-		String[] options = {"Test a new input file", "Test another method on the same file", "Quit"};
-		int controlChoice = 0;
-		
-		do {
-			StdOut.print("Enter a layered list input file => ");
-			String inputFile = StdIn.readLine();
+        String[] methods = {"makeSortedList", "makeTree", "makeEncodings", "encodeFromArray", "decode"};
+        String[] options = {"Test new file", "Test new method on the same file", "Quit"};
+        int repeatChoice = 0;
 
-			do {
-				StdOut.println("\nWhat method would you like to test?");
-				for (int i = 0; i < 6; i++) {
-					StdOut.printf("%d. %s\n", i+1, methods[i]);
-				}
-				StdOut.print("Enter a number => ");
-				int choice = Integer.parseInt(StdIn.readLine());
+        do {
+            System.err.print("Enter an input text file name => ");
+            String input = StdIn.readLine();
+            System.err.println();
 
-				switch (choice) {
-					case 1:
-						testMakeList(inputFile);
-						break;
-					case 2:
-						testRemoveStation(inputFile);
-						break;
-					case 3:
-						testAddStop(inputFile);
-						break;
-					case 4:
-						testBestPath(inputFile);
-						break;
-					case 5:
-						testDuplicate(inputFile);
-						break;
-					case 6:
-						testAddScooter(inputFile);
-						break;
-					default:
-						StdOut.println("Not a valid option!");
-				}
+            do {
+                System.err.println("What method would you like to test? Later methods rely on previous methods.");
 
-				StdOut.println("What would you like to do now?");
-				for (int i = 0; i < 3; i++) {
-					StdOut.printf("%d. %s\n", i+1, options[i]);
-				}
-				StdOut.print("Enter a number => ");
-				controlChoice = Integer.parseInt(StdIn.readLine());
-			} while (controlChoice == 2);
-		} while (controlChoice == 1);
+                for (int i = 0; i < 5; i++) {
+                    System.err.printf("%d. %s\n", i+1, methods[i]);
+                }
+
+                System.err.print("Enter a number => ");
+                int choice = StdIn.readInt();
+                StdIn.readLine();
+                System.err.println();
+                
+                switch (choice) {
+                    case 1:
+                        testSortedList(input);
+                        break;
+                    case 2:
+                        testMakeTree(input);
+                        break;
+                    case 3:
+                        testMakeEncodings(input);
+                        break;
+                    case 4:
+                        testEncode(input);
+                        break;
+                    case 5:
+                        testDecode(input);
+                        break;
+                    default:
+                        System.err.println("Not a valid method to test!");
+                }
+
+                StdIn.resync();
+
+                System.err.println("\nWhat would you like to do now?");
+                for (int i = 0; i < 3; i++) {
+                    System.err.printf("%d. %s\n", i+1, options[i]);
+                }
+
+                System.err.print("Enter a number => ");
+                repeatChoice = StdIn.readInt();
+                StdIn.readLine();
+                System.err.println();
+
+            } while (repeatChoice == 2);
+        } while (repeatChoice == 1);
+    } 
+    
+    private static void testSortedList(String input) {
+        // Call the student's sorted list method, and output all of them comma separated
+        ArrayList<CharFreq> sortedList = HuffmanCoding.makeSortedList(input);
+        
+        StdOut.println("Note that the decimals are rounded to 2 decimal places.\n");
+        StdOut.printf("%s->%.2f", charToString(sortedList.get(0).getCharacter()), sortedList.get(0).getProbOccurrence());
+
+        for (int i = 1; i < sortedList.size(); i++) {
+            char c = sortedList.get(i).getCharacter();
+            
+            StdOut.printf(", %s->%.2f", charToString(c), sortedList.get(i).getProbOccurrence());
+        }
+        StdOut.println();
     }
 
-    private static TNode testMakeList(String filename) {
-        StdIn.setFile(filename);
-
-		// For each layer, readInt the size, then fill the array
-		int[][] input = new int[3][];
-		for (int i = 0; i < 3; i++) {
-			int[] currentLayer = new int[StdIn.readInt()];
-			for (int j = 0; j < currentLayer.length; j++) {
-				currentLayer[j] = StdIn.readInt();
-			}
-			
-			input[i] = currentLayer;
-		}
-
-		StdIn.resync();
-
-		// Call student's makeList method with the arrays, then display it
-		StdOut.println();
-		TNode trainZero = Transit.makeList(input[0], input[1], input[2]);
-		printList(trainZero);
-		StdOut.println();
-		return trainZero;
+    private static String charToString(char c) {
+        // Make sure special characters don't actually print themselves out
+        switch (c) {
+            case '\n':
+                return "\\n";
+            case '\t':
+                return "\\t";
+            case '\r':
+                return "\\r";
+            default:
+                return "" + c;
+        }
     }
-	
-	private static void printList(TNode trainZero) {
-		// Traverse the starts of the layers, then the layers within
-		for (TNode vertPtr = trainZero; vertPtr != null; vertPtr = vertPtr.down) {
-			for (TNode horizPtr = vertPtr; horizPtr != null; horizPtr = horizPtr.next) {
-				// Output the location, then prepare for the arrow to the next
-				StdOut.print(horizPtr.location);
-				if (horizPtr.next == null) break;
-				
-				// Spacing is determined by the numbers in the walking layer
-				for (int i = horizPtr.location+1; i < horizPtr.next.location; i++) {
-					StdOut.print("--");
-					int numLen = String.valueOf(i).length();
-					for (int j = 0; j < numLen; j++) StdOut.print("-");
-				}
-				StdOut.print("->");
-			}
 
-			// Prepare for vertical lines
-			if (vertPtr.down == null) break;
-			StdOut.println();
-			
-			TNode downPtr = vertPtr.down;
-			// Reset horizPtr, and output a | under each number
-			for (TNode horizPtr = vertPtr; horizPtr != null; horizPtr = horizPtr.next) {
-				// Only print vertical line if down pointer matches
-				while (downPtr.location < horizPtr.location) downPtr = downPtr.next;
-				if (downPtr.location == horizPtr.location && horizPtr.down == downPtr) StdOut.print("|");
-				else StdOut.print(" ");
-				int numLen = String.valueOf(horizPtr.location).length();
-				for (int j = 0; j < numLen-1; j++) StdOut.print(" ");
-				
-				if (horizPtr.next == null) break;
-				
-				for (int i = horizPtr.location+1; i <= horizPtr.next.location; i++) {
-					StdOut.print("  ");
+    private static void testMakeTree(String input) {
+        // Call the student's list method and their tree method, printing out the tree
+        ArrayList<CharFreq> sortedList = HuffmanCoding.makeSortedList(input);
+        
+        StdOut.println("Note that the decimals are rounded to 2 decimal places\n");
+        printTree(HuffmanCoding.makeTree(sortedList));
+        StdOut.println();
+    }
+    
+    private static void printTree(TreeNode root) {
+        printTree(root, "", false, true);
+    }
 
-					if (i != horizPtr.next.location) {
-						numLen = String.valueOf(i).length();
-						for (int j = 0; j < numLen; j++) StdOut.print(" ");
-					}
-				}
-			}
-			StdOut.println();
-		}
-		StdOut.println();
-	}
+    private static void printTree(TreeNode n, String indent, boolean isRight, boolean isRoot) {
+        StdOut.print(indent);
+        
+        // Print out either a right connection or a left connection
+        if (!isRoot) StdOut.print(isRight ? "|-1- " : "+-0- ");
+        
+        // If we're at the root, we don't want a 1 or 0
+        else StdOut.print("+--- ");
 
-	private static void testRemoveStation(String filename) {
-		// Use testMakeList to both print out and obtain original list
-		StdOut.print("\nOriginal List:");
-		TNode trainZero = testMakeList(filename);
-		
-		// Call student removeStation method for specified station and output
-		StdOut.print("Enter a station to remove => ");
-		Transit.removeTrainStation(trainZero, Integer.parseInt(StdIn.readLine()));
-		StdOut.println("\nFinal list:");
-		printList(trainZero);
-		StdOut.println();
-	}
+        if (n == null) {
+            StdOut.println("null");
+            return;
+        }
+        
+        // If we have an associated character print it too, otherwise just the probability
+        if (n.getData().getCharacter() != null) StdOut.print(charToString(n.getData().getCharacter()) + "->");
+        StdOut.printf("%.2f ", n.getData().getProbOccurrence());
+        StdOut.println();
 
-	private static void testAddStop(String filename) {
-		StdOut.print("\nOriginal List:");
-		TNode trainZero = testMakeList(filename);
+        // If no more children we're done
+        if (n.getLeft() == null && n.getRight() == null) return;
 
-		// Call student addStop method on specified number, and display list
-		StdOut.print("Enter a bus stop to add => ");
-		Transit.addBusStop(trainZero, Integer.parseInt(StdIn.readLine()));
-		StdOut.println("\nFinal list:");
-		printList(trainZero);
-		StdOut.println();
-	}
-	
-	private static void testBestPath(String filename) {
-		StdOut.print("\nLayered Linked List:");
-		TNode trainZero = testMakeList(filename);
+        // Add to the indent based on whether we're branching left or right
+        indent += isRight ? "|    " : "     ";
 
-		// Print best path from student bestPath method
-		StdOut.print("Enter a destination => ");
-		int destination = Integer.parseInt(StdIn.readLine());
-		StdOut.println("\nBest path:");
-		ArrayList<TNode> bestPath = Transit.bestPath(trainZero, destination);
-		printBestPath(trainZero, bestPath);
+        printTree(n.getRight(), indent, true, false);
+        printTree(n.getLeft(),  indent, false, false);
+    }
 
-		StdOut.println("\nValues of nodes in your best path:");
-		StdOut.print("{ ");
-		for (TNode t : bestPath) StdOut.print(t.location + " ");
-		StdOut.println("}\n"); 
-	}
+    private static void testMakeEncodings(String input) {
+        // Call student's list, tree, and encoding methods
+        ArrayList<CharFreq> sortedList = HuffmanCoding.makeSortedList(input);
+        TreeNode huffmanTree = HuffmanCoding.makeTree(sortedList);
+        String[] encodings = HuffmanCoding.makeEncodings(huffmanTree);
 
-	private static void printBestPath(TNode trainZero, ArrayList<TNode> path) {
-		for (TNode vertPtr = trainZero; vertPtr != null; vertPtr = vertPtr.down) {
-			for (TNode horizPtr = vertPtr; horizPtr != null; horizPtr = horizPtr.next) {
-				// ONLY print the number if this node is in the path, otherwise spaces
-				if (path.contains(horizPtr)) StdOut.print(horizPtr.location);
-				else {
-					int numLen = String.valueOf(horizPtr.location).length();
-					for (int i = 0; i < numLen; i++) StdOut.print(" ");
-				}
-				if (horizPtr.next == null) break;
-				
-				// ONLY print the edge if both ends are in the path, otherwise spaces
-				String separator = (path.contains(horizPtr) && path.contains(horizPtr.next)) ? ">" : " ";
-				for (int i = horizPtr.location+1; i < horizPtr.next.location; i++) {
-					StdOut.print(separator + separator);
-					
-					int numLen = String.valueOf(i).length();
-					for (int j = 0; j < numLen; j++) StdOut.print(separator);
-				}
+        boolean first = true;
 
-				StdOut.print(separator + separator);
-			}
-			
-			if (vertPtr.down == null) break;
-			StdOut.println();
+        // Print out all their encodings (which are not null)
+        for (int i = 0; i < 128; i++) {
+            if (encodings[i] != null) {
+                if (!first) StdOut.print(", ");
+                
+                StdOut.printf("%s->%s", charToString((char)i), encodings[i]);
+                first = false;
+            }
+        }
+        StdOut.println();
+    }
+    
+    private static void testEncode(String input) {
+        // Take in an encoding file and call the student's encode method
+        System.err.print("File to encode into (can be new) => ");
+        String encodedFile = StdIn.readLine();
+        System.err.println();
 
-			for (TNode horizPtr = vertPtr; horizPtr != null; horizPtr = horizPtr.next) {
-				// ONLY print the vertical edge if both ends are in the path, otherwise space
-				StdOut.print((path.contains(horizPtr) && path.contains(horizPtr.down)) ? "V" : " ");
-				int numLen = String.valueOf(horizPtr.location).length();
-				for (int j = 0; j < numLen-1; j++) StdOut.print(" ");
-				
-				if (horizPtr.next == null) break;
-				
-				for (int i = horizPtr.location+1; i <= horizPtr.next.location; i++) {
-					StdOut.print("  ");
+        ArrayList<CharFreq> sortedList = HuffmanCoding.makeSortedList(input);
+        TreeNode huffmanTree = HuffmanCoding.makeTree(sortedList);
+        String[] encodings = HuffmanCoding.makeEncodings(huffmanTree);
 
-					if (i != horizPtr.next.location) {
-						numLen = String.valueOf(i).length();
-						for (int j = 0; j < numLen; j++) StdOut.print(" ");
-					}
-				}
-			}
-			StdOut.println();
-		}
-		StdOut.println();
-	}
+        HuffmanCoding.encodeFromArray(encodings, input, encodedFile);
+        System.err.println("The input text file has been encoded into " + encodedFile);
+    }
+    
+    private static void testDecode(String input) {
+        // Encode and decode the student's file (with their decode method)
+        // Can be piped to a file for large inputs
+        System.err.print("File to encode into (can be new) => ");
+        String encodedFile = StdIn.readLine();
+        System.err.println();
 
-	private static void testDuplicate(String filename) {
-		StdOut.print("\nOriginal list:");
-		TNode trainZero = testMakeList(filename);
+        ArrayList<CharFreq> sortedList = HuffmanCoding.makeSortedList(input);
+        TreeNode huffmanTree = HuffmanCoding.makeTree(sortedList);
+        String[] encodings = HuffmanCoding.makeEncodings(huffmanTree);
+        HuffmanCoding.encodeFromArray(encodings, input, encodedFile);
 
-		// Call student duplicate method then print list
-		StdOut.println("Duplicate:");
-		printList(Transit.duplicate(trainZero));
-		StdOut.println();
-	}
-	
-	private static void testAddScooter(String filename) {
-		StdOut.print("\nOriginal list:");
-		TNode trainZero = testMakeList(filename);
+        StdIn.resync();
+        
+        System.err.println("The input text file has been encoded into " + encodedFile);
+        
+        System.err.print("File to decode into (can be new) => ");
+        String decodedFile = StdIn.readLine();
+        System.err.println();
 
-		// Read in scooter size, then read in each scooter stop
-		StdOut.print("Enter a scooter layer input file => ");
-		String scooterFile = StdIn.readLine();
-		StdIn.setFile(scooterFile);
-		int[] scooterStops = new int[StdIn.readInt()];
-		for (int i = 0; i < scooterStops.length; i++) {
-			scooterStops[i] = StdIn.readInt();
-		}
-		StdIn.resync();
-
-		// Call student addScooter method and print out list
-		Transit.addScooter(trainZero, scooterStops);
-		StdOut.println("\nFinal list:");
-		printList(trainZero);
-		StdOut.println();
-	}
+        HuffmanCoding.decode(encodedFile, huffmanTree, decodedFile);
+        System.err.println("The file has been decoded into " + decodedFile);
+        System.err.println();
+    }
 }

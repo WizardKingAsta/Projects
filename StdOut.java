@@ -1,3 +1,4 @@
+package huffman;
 /******************************************************************************
 
  *  Compilation:  javac StdOut.java
@@ -10,6 +11,7 @@
 
 import java.lang.System;
 import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -86,11 +88,32 @@ public final class StdOut {
     // don't instantiate
     private StdOut() { }
 
+    public static void setFile(String filename) {
+        try {
+            out = new PrintWriter(new FileOutputStream(new java.io.File(filename)), true);
+        }
+        catch (Exception e) {
+            try {
+            java.io.File file = new java.io.File(filename);
+            file.createNewFile();
+            out = new PrintWriter(new FileOutputStream(new java.io.File(filename)), true);
+            }
+            catch (Exception e2) {
+                System.out.println("Something went wrong!");
+            }
+        }
+    }
+
+    public static void close() {
+        out.close();
+    }
+
    /**
      * Terminates the current line by printing the line-separator string.
      */
     public static void println() {
         out.println();
+        out.flush();
     }
 
    /**
@@ -100,6 +123,7 @@ public final class StdOut {
      */
     public static void println(Object x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -109,6 +133,7 @@ public final class StdOut {
      */
     public static void println(boolean x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -118,6 +143,7 @@ public final class StdOut {
      */
     public static void println(char x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -127,6 +153,7 @@ public final class StdOut {
      */
     public static void println(double x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -136,6 +163,7 @@ public final class StdOut {
      */
     public static void println(float x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -145,6 +173,7 @@ public final class StdOut {
      */
     public static void println(int x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -154,6 +183,7 @@ public final class StdOut {
      */
     public static void println(long x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -163,6 +193,7 @@ public final class StdOut {
      */
     public static void println(short x) {
         out.println(x);
+        out.flush();
     }
 
    /**
@@ -174,6 +205,7 @@ public final class StdOut {
      */
     public static void println(byte x) {
         out.println(x);
+        out.flush();
     }
 
    /**
